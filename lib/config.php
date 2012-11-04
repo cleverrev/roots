@@ -28,16 +28,16 @@ function roots_display_sidebar() {
      * The second element must be an array even if there's only 1 argument.
      */
     array(
-      'is_404',
-      'is_front_page',
-	  'roots_sidebar_conditional'
+      //'is_404',
+      //'is_front_page',
+      'roots_sidebar_conditional'
     ),
     /**
      * Page template checks (via is_page_template())
      * Any of these page templates that return true won't show the sidebar
      */
     array(
-      'page-custom.php'
+      //'page-custom.php'
     )
   );
 
