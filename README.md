@@ -26,4 +26,4 @@ Common enqueues/dequeues:
 # Tips
 
 - Copy `lib/config.php` to `lib/config.php` in the root of your child theme. Now you have full control over sidebar display, generated classes and other configurations from the child.
-- This version of roots adds a "sidebar wrapper" which causes base.php wrap the sidebar include in addition to the content include. Create template files such as `templates/sidebar-page.php` or `templates/sidebar-taxonomy-my_tax.php`.
+- This version of roots adds a "sidebar wrapper"; base.php wraps the sidebar include allowing creation of template files like `templates/sidebar-page.php` or `templates/sidebar-taxonomy-my_tax.php`.
