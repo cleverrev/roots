@@ -4,7 +4,7 @@ This is a parent version of [Roots Theme](http://www.rootstheme.com/).
 
 # Example Code
 
-Here I'll give some example code for your child's functions.php
+Example code for your child's functions.php
 
 Common enqueues/dequeues:
 
