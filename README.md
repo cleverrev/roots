@@ -1,6 +1,6 @@
 # Parent version of Roots Theme
 
-This is a parent version of [Roots Theme](http://www.rootstheme.com/).
+This is a parent version of [Roots Theme](http://www.rootstheme.com/). Includes [Font Awesome 3.0](http://fortawesome.github.com/Font-Awesome/)
 
 # Example Code
 
