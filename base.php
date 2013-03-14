@@ -5,6 +5,7 @@
   
   <?php tha_header_before(); ?>
   <?php
+    do_action('get_header');
     // Use Bootstrap's navbar if enabled in config.php
     if (current_theme_supports('bootstrap-top-navbar')) {
       get_template_part('templates/header-top-navbar');
@@ -14,26 +15,25 @@
   ?>
   <?php tha_header_after(); ?>
 
-  <div id="wrap" class="container" role="document">
-    <div id="content" class="row">
+  <div class="wrap container" role="document">
+    <div class="content row">
       <?php tha_content_before(); ?>
-      <div id="main" class="<?php echo roots_main_class(); ?>" role="main">
-        <?php tha_content_top(); ?>
+      <div class="main <?php echo roots_main_class(); ?>" role="main">
+      <?php tha_content_top(); ?>
         <?php include roots_template_path(); ?>
         <?php tha_content_bottom(); ?>
-      </div>
+      </div><!-- /.main -->
       <?php tha_content_after(); ?>
       <?php if (roots_display_sidebar()) : ?>
       <?php tha_sidebars_before(); ?>
-      <aside id="sidebar" class="<?php echo roots_sidebar_class(); ?>" role="complementary">
-        <?php tha_sidebar_top(); ?>
+      <aside class="sidebar <?php echo roots_sidebar_class(); ?>" role="complementary">
+      <?php tha_sidebar_top(); ?>
         <?php include roots_sidebar_path(); ?>
-        <?php tha_sidebar_bottom(); ?>
-      </aside>
-      <?php tha_sidebars_after(); ?>
+      <?php tha_sidebar_bottom(); ?>
+      </aside><!-- /.sidebar -->
       <?php endif; ?>
-    </div><!-- /#content -->
-  </div><!-- /#wrap -->
+    </div><!-- /.content -->
+  </div><!-- /.wrap -->
 
   <?php get_template_part('templates/footer'); ?>
 

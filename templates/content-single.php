@@ -1,6 +1,6 @@
 <?php while (have_posts()) : the_post(); ?>
   <?php tha_entry_before(); ?>
-  <article <?php post_class() ?> id="post-<?php the_ID(); ?>">
+  <article <?php post_class(); ?>>
     <?php tha_entry_top(); ?>
     <header>
       <h1 class="entry-title"><?php the_title(); ?></h1>
@@ -10,7 +10,7 @@
       <?php the_content(); ?>
     </div>
     <footer>
-      <?php wp_link_pages(array('before' => '<nav id="page-nav"><p>' . __('Pages:', 'roots'), 'after' => '</p></nav>')); ?>
+      <?php wp_link_pages(array('before' => '<nav class="page-nav"><p>' . __('Pages:', 'roots'), 'after' => '</p></nav>')); ?>
       <?php the_tags('<ul class="entry-tags"><li>','</li><li>','</li></ul>'); ?>
     </footer>
     <?php tha_entry_bottom(); ?>

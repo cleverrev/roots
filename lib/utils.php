@@ -1,70 +1,18 @@
 <?php
-
 /**
- * Theme Wrapper
+ * Theme wrapper
  *
  * @link http://scribu.net/wordpress/theme-wrappers.html
  */
-
-function roots_title() {
-  if (is_home()) {
-	if (get_option('page_for_posts', true)) {
-	  echo get_the_title(get_option('page_for_posts', true));
-	} else {
-	  _e('Latest Posts', 'roots');
-	}
-  } elseif (is_archive()) {
-	$term = get_term_by('slug', get_query_var('term'), get_query_var('taxonomy'));
-	if ($term) {
-	  echo $term->name;
-	} elseif (is_post_type_archive()) {
-	  echo get_queried_object()->labels->name;
-	} elseif (is_day()) {
-	  printf(__('Daily Archives: %s', 'roots'), get_the_date());
-	} elseif (is_month()) {
-	  printf(__('Monthly Archives: %s', 'roots'), get_the_date('F Y'));
-	} elseif (is_year()) {
-	  printf(__('Yearly Archives: %s', 'roots'), get_the_date('Y'));
-	} elseif (is_author()) {
-	  global $post;
-	  $author_id = $post->post_author;
-	  printf(__('Author Archives: %s', 'roots'), get_the_author_meta('display_name', $author_id));
-	} else {
-	  single_cat_title();
-	}
-  } elseif (is_search()) {
-	printf(__('Search Results for %s', 'roots'), get_search_query());
-  } elseif (is_404()) {
-	_e('File Not Found', 'roots');
-  } else {
-	the_title();
-  }
-}
-
-function roots_sidebar_path() {
-  $main_template = roots_template_path();
-
-  $base = substr(basename($main_template), 0, -4);
-
-  if ($base === 'index') {
-    $base = false;
-  }
-
-  $templates = array('templates/sidebar.php');
-
-  if ($base) {
-    array_unshift($templates, sprintf('templates/sidebar-%s.php', $base ));
-  }
-
-  return locate_template($templates);
-}
-
 function roots_template_path() {
   return Roots_Wrapping::$main_template;
 }
 
-class Roots_Wrapping {
+function roots_sidebar_path() {
+  return Roots_Wrapping::sidebar();
+}
 
+class Roots_Wrapping {
   // Stores the full path to the main template file
   static $main_template;
 
@@ -83,16 +31,75 @@ class Roots_Wrapping {
     $templates = array('base.php');
 
     if (self::$base) {
-      array_unshift($templates, sprintf('base-%s.php', self::$base ));
+      array_unshift($templates, sprintf('base-%s.php', self::$base));
+    }
+
+    return locate_template($templates);
+  }
+
+  static function sidebar() {
+    $templates = array('templates/sidebar.php');
+
+    if (self::$base) {
+      array_unshift($templates, sprintf('templates/sidebar-%s.php', self::$base));
     }
 
     return locate_template($templates);
   }
 }
-
 add_filter('template_include', array('Roots_Wrapping', 'wrap'), 99);
 
-// returns WordPress subdirectory if applicable
+/**
+ * Page titles
+ */
+function roots_title() {
+  if (is_home()) {
+    if (get_option('page_for_posts', true)) {
+      echo get_the_title(get_option('page_for_posts', true));
+    } else {
+      _e('Latest Posts', 'roots');
+    }
+  } elseif (is_archive()) {
+    $term = get_term_by('slug', get_query_var('term'), get_query_var('taxonomy'));
+    if ($term) {
+      echo $term->name;
+    } elseif (is_post_type_archive()) {
+      echo get_queried_object()->labels->name;
+    } elseif (is_day()) {
+      printf(__('Daily Archives: %s', 'roots'), get_the_date());
+    } elseif (is_month()) {
+      printf(__('Monthly Archives: %s', 'roots'), get_the_date('F Y'));
+    } elseif (is_year()) {
+      printf(__('Yearly Archives: %s', 'roots'), get_the_date('Y'));
+    } elseif (is_author()) {
+      printf(__('Author Archives: %s', 'roots'), get_the_author());
+    } else {
+      single_cat_title();
+    }
+  } elseif (is_search()) {
+    printf(__('Search Results for %s', 'roots'), get_search_query());
+  } elseif (is_404()) {
+    _e('Not Found', 'roots');
+  } else {
+    the_title();
+  }
+}
+
+/**
+ * Show an admin notice if .htaccess isn't writable
+ */
+function roots_htaccess_writable() {
+  if (!is_writable(get_home_path() . '.htaccess')) {
+    if (current_user_can('administrator')) {
+      add_action('admin_notices', create_function('', "echo '<div class=\"error\"><p>" . sprintf(__('Please make sure your <a href="%s">.htaccess</a> file is writable ', 'roots'), admin_url('options-permalink.php')) . "</p></div>';"));
+    }
+  }
+}
+add_action('admin_init', 'roots_htaccess_writable');
+
+/**
+ * Return WordPress subdirectory if applicable
+ */
 function wp_base_dir() {
   preg_match('!(https?://[^/|"]+)([^"]+)?!', site_url(), $matches);
   if (count($matches) === 3) {
@@ -102,7 +109,9 @@ function wp_base_dir() {
   }
 }
 
-// opposite of built in WP functions for trailing slashes
+/**
+ * Opposite of built in WP functions for trailing slashes
+ */
 function leadingslashit($string) {
   return '/' . unleadingslashit($string);
 }
