@@ -1,74 +1,65 @@
-# [Roots Theme](http://www.rootstheme.com/)
+# Roots Theme — Templating
 
-Roots is a starting WordPress theme made for developers that’s based on
-[HTML5 Boilerplate](http://html5boilerplate.com/) and [Bootstrap from Twitter](http://twitter.github.com/bootstrap/).
+This branch uses simple examples to illustrate [Roots](https://github.com/retlehs/roots/) templating *in general*.
 
-* Source: [https://github.com/retlehs/roots](https://github.com/retlehs/roots)
-* Home Page: [http://www.rootstheme.com/](http://www.rootstheme.com/)
-* Twitter: [@retlehs](https://twitter.com/retlehs)
-* Google Group: [http://groups.google.com/group/roots-theme](http://groups.google.com/group/roots-theme)
+# Normal Template Hierarchy (Bad)
 
-## Installation
+By defualt in WordPress, both layout and content are expected to exist in a single template file (violating [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself)).
 
-* Clone the git repo - `git clone git://github.com/retlehs/roots.git` - or [download it](https://github.com/retlehs/roots/zipball/master)
-* Reference the [theme activation](doc/activation.md) documentation to understand
-everything that happens once you activate Roots
+![WordPress Template Hierarchy — from wordpress.org](http://codex.wordpress.org/images/1/18/Template_Hierarchy.png "WordPress Template Hierarchy")
 
-## Configuration
+# Roots Template Hierarchy (Better)
 
-Edit `lib/config.php` to enable or disable support for various theme functions
-and to define constants that are used throughout the theme.
+However in Roots, the [theme wrapper](http://scribu.net/wordpress/theme-wrappers.html) breaks out layout and content into multiple files (enabling [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself)).
 
-Edit `lib/init.php` to setup custom navigation menus and post thumbnail sizes.
+    [] = default behavior — sometimes it may make sense to override this pattern.
 
-## Documentation
+    Least common denominator;
+    Rarely need to create;        Create as needed;
+    Defaults to base.php          See normal hierarchy
+           \                               /                   End of the line;
+            +---[roots_template_path()]---+                    Reusable parts
+            |                             |                            /
+            |                             +---[get_template_part()]---+
+            |                             |                           |
+    Site Front Page                       |                           |
+      base-front-page.php            front-page.php            [templates/*.php]
+      base-home.php                  home.php                  [templates/*.php]
+            |                             |                           |
+    Single Post Display                   |                           |
+      base-single-{post_type}.php    single-{post_type}.php    [templates/*.php]
+      base-single.php                single.php                [templates/*.php]
+            |                             |                           |
+    Page Display                          |                           |
+      base-page-{slug}.php           page-{slug}.php           [templates/*.php]
+      base-page-{id}.php             page-{id}.php             [templates/*.php]
+      base-page.php                  page.php                  [templates/*.php]
+            |                             |                           |
+    Category Display                      |                           |
+      base-category-{slug}.php       category-{slug}.php       [templates/*.php]
+      base-category-{id}.php         category-{id}.php         [templates/*.php]
+      base-category.php              category.php              [templates/*.php]
+            |                             |                           |
+    Tag Display                           |                           |
+      base-tag-{slug}.php            tag-{slug}.php            [templates/*.php]
+      base-tag-{id}.php              tag-{id}.php              [templates/*.php]
+      base-tag.php                   tag.php                   [templates/*.php]
 
-Take a look at the [documentation table of contents](doc/TOC.md).
+    ...and so on:
 
-## Features
+    Custom Taxonomies Display           Search Result Display
+      taxonomy-{taxonomy}-{term}.php      search.php
+      base-taxonomy-{taxonomy}.php
+      taxonomy.php                      404 (Not Found) Display
+                                          404.php
+    Custom Post Types Display
+      archive-{post_type}.php           Attachment Display
+                                          MIME_type.php
+    Author Display
+      author-{nicename}.php             Date Display
+      author-{id}.php                     date.php
+      author.php
+      
+Default use of roots_template_path() and get_template_part(): [base.php](base.php) and [page.php](page.php) or [single.php](single.php).
 
-* HTML5 Boilerplate’s markup and `.htaccess`
-* Bootstrap from Twitter
-* [Theme wrapper](doc/wrapper.md)
-* Root relative URLs
-* Clean URLs (no more `/wp-content/`)
-* All static theme assets are rewritten to the website root (`/assets/css/`,
-`/assets/img/`, and `/assets/js/`)
-* Cleaner HTML output of navigation menus
-* Cleaner output of `wp_head` and enqueued scripts/styles
-* Posts use the [hNews](http://microformats.org/wiki/hnews) microformat
-* [Multilingual ready](http://www.rootstheme.com/wpml/) (Brazilian Portuguese,
-Bulgarian, Catalan, Danish, Dutch, English, Finnish, French, German, Hungarian,
-Indonesian, Italian, Korean, Macedonian, Norwegian, Polish, Russian, Simplified
-Chinese, Spanish, Swedish, Traditional Chinese, Turkish, Vietnamese)
-
-### Build Script
-
-The [grunt branch](https://github.com/retlehs/roots/tree/grunt) contains a build
-script powered by grunt. More information can be found at [Integrating grunt.js with Roots](http://benword.com/integrating-grunt-js-with-roots/).
-
-* Easily compile LESS files
-* Minification and concatenation without plugins
-* Fewer requests made to the server (one CSS file, one main JS file besides
-Modernizr and jQuery)
-* Ensures valid JavaScript
-* Others working on your project are able to use the same build script and have
-a unified development process
-* Code is optimized for production use
-
-## Contributing
-
-Everyone is welcome to help [contribute](CONTRIBUTING.md) and improve this project.
-There are several ways you can contribute:
-
-* Reporting issues (please read [issue guidelines](https://github.com/necolas/issue-guidelines))
-* Suggesting new features
-* Writing or editing [docs](doc/TOC.md)
-* Writing or refactoring code
-* Fixing [issues](https://github.com/retlehs/roots/issues)
-* Replying to questions on the [Google Group](http://groups.google.com/group/roots-theme)
-
-## Support
-
-Use the [Google Group](http://groups.google.com/group/roots-theme) to ask
-questions and get support.
+Custom template examples: [base-front-page.php](base-front-page.php), [front-page.php](front-page.php), [category.php](category.php), [category-radio.php](category-radio.php), and [archive-movie_review.php](archive-movie_review.php). Note: examples untested; report any issues.
