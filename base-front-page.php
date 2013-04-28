@@ -12,7 +12,7 @@
   
   <?php get_template_part('templates/header-top-navbar'); ?>
 
-  <?php include roots_template_path(); //=> front-page.php ?>
+  <?php include roots_template_path(); /* front-page.php */ ?>
 
   <?php get_template_part('templates/footer'); ?>
 
