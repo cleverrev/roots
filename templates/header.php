@@ -1,4 +1,5 @@
 <header class="banner" role="banner">
+  <?php tha_header_top(); ?>
   <div class="container">
     <a class="brand" href="<?php echo home_url(); ?>/"><?php bloginfo('name'); ?></a>
     <nav class="nav-main" role="navigation">
@@ -9,4 +10,5 @@
       ?>
     </nav>
   </div>
+  <?php tha_header_bottom(); ?>
 </header>

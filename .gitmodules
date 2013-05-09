@@ -1,0 +1,3 @@
+[submodule "lib/themehookalliance"]
+	path = lib/themehookalliance
+	url = git@github.com:zamoose/themehookalliance.git
