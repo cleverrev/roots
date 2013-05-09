@@ -1,74 +1,54 @@
-# [Roots Theme](http://www.rootstheme.com/)
+# Roots Theme — Parent
 
-Roots is a starting WordPress theme made for developers that’s based on
-[HTML5 Boilerplate](http://html5boilerplate.com/) and [Bootstrap from Twitter](http://twitter.github.com/bootstrap/).
+Proof of concept using [Roots Theme](http://www.rootstheme.com/) as a [parent theme](http://codex.wordpress.org/Child_Themes) without removing theme support for `root-relative-urls` or `rewrites`. Also implements [Theme Hook Alliance](https://github.com/zamoose/themehookalliance).
 
-* Source: [https://github.com/retlehs/roots](https://github.com/retlehs/roots)
-* Home Page: [http://www.rootstheme.com/](http://www.rootstheme.com/)
-* Twitter: [@retlehs](https://twitter.com/retlehs)
-* Google Group: [http://groups.google.com/group/roots-theme](http://groups.google.com/group/roots-theme)
+## Example Code
 
-## Installation
+Example code for your child's `functions.php`
 
-* Clone the git repo - `git clone git://github.com/retlehs/roots.git` - or [download it](https://github.com/retlehs/roots/zipball/master)
-* Reference the [theme activation](doc/activation.md) documentation to understand
-everything that happens once you activate Roots
+Common enqueues/dequeues:
 
-## Configuration
+    add_action( 'wp_enqueue_scripts', 'my_enqueue_scripts', 101 );
+    function my_enqueue_scripts() {
+      // dequeue style.css
+      wp_dequeue_style( 'roots_child' );
+      
+      // enqueue child_plugins.js
+      wp_enqueue_script( 'my_child_plugins', 
+        trailingslashit( get_stylesheet_directory_uri() ) . 'assets/js/child_plugins.js', array(), false );
+      
+      // enqueue main.js with custom dependencies
+      wp_dequeue_script( 'roots_main' );
+      wp_enqueue_script( 'my_main', 
+        trailingslashit( get_stylesheet_directory_uri() ) . 'assets/js/main.js', array( 'jquery', 'my_child_plugins' ), false );
+    }
+    
+## Tips
 
-Edit `lib/config.php` to enable or disable support for various theme functions
-and to define constants that are used throughout the theme.
+- Copy `lib/config.php` to `lib/config.php` in the root of your child theme. Now you have full control over sidebar display, generated classes and other configurations from the child.
+- If permalinks/rewrites are working and being used, assets in the child will successfully override parent assets. If rewrites aren't activated, the child assets must be explicitly registered, and the parents unregistered. To test the override, create `assets/js/main.js` or `assets/css/app.css` in the child; it should get included instead of the parent version of the same file.
 
-Edit `lib/init.php` to setup custom navigation menus and post thumbnail sizes.
+## Reference
 
-## Documentation
+This is what your `.htaccess` would look like using [roots-simple-child](https://github.com/leoj3n/roots-simple-child):
 
-Take a look at the [documentation table of contents](doc/TOC.md).
+```
 
-## Features
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{DOCUMENT_ROOT}/app/themes/roots-simple-child/$1 -f
+RewriteRule ^(.*[^/])/?$ /app/themes/roots-simple-child/$1 [QSA,L]
+RewriteCond %{DOCUMENT_ROOT}/app/themes/roots/$1 -f
+RewriteRule ^(.*[^/])/?$ /app/themes/roots/$1 [QSA,L]
+RewriteRule ^plugins/(.*) /app/plugins/$1 [QSA,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
 
-* HTML5 Boilerplate’s markup
-* Bootstrap from Twitter
-* [Theme wrapper](doc/wrapper.md)
-* Root relative URLs
-* Clean URLs (no more `/wp-content/`)
-* All static theme assets are rewritten to the website root (`/assets/css/`,
-`/assets/img/`, and `/assets/js/`)
-* Cleaner HTML output of navigation menus
-* Cleaner output of `wp_head` and enqueued scripts/styles
-* Posts use the [hNews](http://microformats.org/wiki/hnews) microformat
-* [Multilingual ready](http://www.rootstheme.com/wpml/) (Brazilian Portuguese,
-Bulgarian, Catalan, Danish, Dutch, English, Finnish, French, German, Hungarian,
-Indonesian, Italian, Korean, Macedonian, Norwegian, Polish, Russian, Simplified
-Chinese, Spanish, Swedish, Traditional Chinese, Turkish, Vietnamese)
+# END WordPress
 
-### Build Script
-
-The [grunt branch](https://github.com/retlehs/roots/tree/grunt) contains a build
-script powered by grunt. More information can be found at [Integrating grunt.js with Roots](http://benword.com/integrating-grunt-js-with-roots/).
-
-* Easily compile LESS files
-* Minification and concatenation without plugins
-* Fewer requests made to the server (one CSS file, one main JS file besides
-Modernizr and jQuery)
-* Ensures valid JavaScript
-* Others working on your project are able to use the same build script and have
-a unified development process
-* Code is optimized for production use
-
-## Contributing
-
-Everyone is welcome to help [contribute](CONTRIBUTING.md) and improve this project.
-There are several ways you can contribute:
-
-* Reporting issues (please read [issue guidelines](https://github.com/necolas/issue-guidelines))
-* Suggesting new features
-* Writing or editing [docs](doc/TOC.md)
-* Writing or refactoring code
-* Fixing [issues](https://github.com/retlehs/roots/issues)
-* Replying to questions on the [Google Group](http://groups.google.com/group/roots-theme)
-
-## Support
-
-Use the [Google Group](http://groups.google.com/group/roots-theme) to ask
-questions and get support.
+```
