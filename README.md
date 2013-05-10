@@ -2,13 +2,13 @@
 
 This branch uses simple examples to illustrate [Roots](https://github.com/retlehs/roots/) templating *in general*.
 
-# Normal Template Hierarchy (Bad)
+## Normal Template Hierarchy (Bad)
 
 By defualt in WordPress, both layout and content are expected to exist in a single template file (violating [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself)).
 
 ![WordPress Template Hierarchy — from wordpress.org](http://codex.wordpress.org/images/1/18/Template_Hierarchy.png "WordPress Template Hierarchy")
 
-# Roots Template Hierarchy (Better)
+## Roots Template Hierarchy (Better)
 
 However in Roots, the [theme wrapper](http://scribu.net/wordpress/theme-wrappers.html) breaks out layout and content into multiple files (enabling [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself)).
 
