@@ -3,7 +3,6 @@
  * URL rewriting
  *
  * Rewrites currently do not happen for network installs
- * @todo https://github.com/retlehs/roots/issues/461
  *
  * Rewrite:
  *   /*       to /wp-content/themes/[parent]/*

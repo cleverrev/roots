@@ -8,9 +8,6 @@
   <div class="entry-summary">
     <?php the_excerpt(); ?>
   </div>
-  <footer>
-    <?php the_tags('<ul class="entry-tags"><li>','</li><li>','</li></ul>'); ?>
-  </footer>
   <?php tha_entry_bottom(); ?>
 </article>
 <?php tha_entry_after(); ?>

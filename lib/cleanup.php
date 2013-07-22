@@ -99,8 +99,8 @@ add_filter('wp_title', 'roots_wp_title', 10);
  */
 function roots_clean_style_tag($input) {
   preg_match_all("!<link rel='stylesheet'\s?(id='[^']+')?\s+href='(.*)' type='text/css' media='(.*)' />!", $input, $matches);
-  // Only display media if it's print
-  $media = $matches[3][0] === 'print' ? ' media="print"' : '';
+  // Only display media if it is meaningful
+  $media = $matches[3][0] !== '' && $matches[3][0] !== 'all' ? ' media="' . $matches[3][0] . '"' : '';
   return '<link rel="stylesheet" href="' . $matches[2][0] . '"' . $media . '>' . "\n";
 }
 add_filter('style_loader_tag', 'roots_clean_style_tag');
@@ -127,54 +127,6 @@ function roots_body_class($classes) {
 add_filter('body_class', 'roots_body_class');
 
 /**
- * Root relative URLs
- *
- * WordPress likes to use absolute URLs on everything - let's clean that up.
- * Inspired by http://www.456bereastreet.com/archive/201010/how_to_make_wordpress_urls_root_relative/
- *
- * You can enable/disable this feature in config.php:
- * current_theme_supports('root-relative-urls');
- *
- * @author Scott Walkinshaw <scott.walkinshaw@gmail.com>
- */
-function roots_root_relative_url($input) {
-  preg_match('|https?://([^/]+)(/.*)|i', $input, $matches);
-
-  if (isset($matches[1]) && isset($matches[2]) && $matches[1] === $_SERVER['SERVER_NAME']) {
-    return wp_make_link_relative($input);
-  } else {
-    return $input;
-  }
-}
-
-function roots_enable_root_relative_urls() {
-  return !(is_admin() || in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php'))) && current_theme_supports('root-relative-urls');
-}
-
-if (roots_enable_root_relative_urls()) {
-  $root_rel_filters = array(
-    'bloginfo_url',
-    'the_permalink',
-    'wp_list_pages',
-    'wp_list_categories',
-    'roots_wp_nav_menu_item',
-    'the_content_more_link',
-    'the_tags',
-    'get_pagenum_link',
-    'get_comment_link',
-    'month_link',
-    'day_link',
-    'year_link',
-    'tag_link',
-    'the_author_posts_link',
-    'script_loader_src',
-    'style_loader_src'
-  );
-
-  add_filters($root_rel_filters, 'roots_root_relative_url');
-}
-
-/**
  * Wrap embedded media as suggested by Readability
  *
  * @link https://gist.github.com/965956
@@ -184,7 +136,6 @@ function roots_embed_wrap($cache, $url, $attr = '', $post_ID = '') {
   return '<div class="entry-content-asset">' . $cache . '</div>';
 }
 add_filter('embed_oembed_html', 'roots_embed_wrap', 10, 4);
-add_filter('embed_googlevideo', 'roots_embed_wrap', 10, 2);
 
 /**
  * Add class="thumbnail" to attachment items
@@ -236,105 +187,6 @@ function roots_caption($output, $attr, $content) {
 add_filter('img_caption_shortcode', 'roots_caption', 10, 3);
 
 /**
- * Clean up gallery_shortcode()
- *
- * Re-create the [gallery] shortcode and use thumbnails styling from Bootstrap
- *
- * @link http://twitter.github.com/bootstrap/components.html#thumbnails
- */
-function roots_gallery($attr) {
-  $post = get_post();
-
-  static $instance = 0;
-  $instance++;
-
-  if (!empty($attr['ids'])) {
-    if (empty($attr['orderby'])) {
-      $attr['orderby'] = 'post__in';
-    }
-    $attr['include'] = $attr['ids'];
-  }
-
-  $output = apply_filters('post_gallery', '', $attr);
-
-  if ($output != '') {
-    return $output;
-  }
-
-  if (isset($attr['orderby'])) {
-    $attr['orderby'] = sanitize_sql_orderby($attr['orderby']);
-    if (!$attr['orderby']) {
-      unset($attr['orderby']);
-    }
-  }
-
-  extract(shortcode_atts(array(
-    'order'      => 'ASC',
-    'orderby'    => 'menu_order ID',
-    'id'         => $post->ID,
-    'itemtag'    => '',
-    'icontag'    => '',
-    'captiontag' => '',
-    'columns'    => 3,
-    'size'       => 'thumbnail',
-    'include'    => '',
-    'exclude'    => ''
-  ), $attr));
-
-  $id = intval($id);
-
-  if ($order === 'RAND') {
-    $orderby = 'none';
-  }
-
-  if (!empty($include)) {
-    $_attachments = get_posts(array('include' => $include, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby));
-
-    $attachments = array();
-    foreach ($_attachments as $key => $val) {
-      $attachments[$val->ID] = $_attachments[$key];
-    }
-  } elseif (!empty($exclude)) {
-    $attachments = get_children(array('post_parent' => $id, 'exclude' => $exclude, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby));
-  } else {
-    $attachments = get_children(array('post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $order, 'orderby' => $orderby));
-  }
-
-  if (empty($attachments)) {
-    return '';
-  }
-
-  if (is_feed()) {
-    $output = "\n";
-    foreach ($attachments as $att_id => $attachment) {
-      $output .= wp_get_attachment_link($att_id, $size, true) . "\n";
-    }
-    return $output;
-  }
-
-  $output = '<ul class="thumbnails gallery">';
-
-  $i = 0;
-  foreach ($attachments as $id => $attachment) {
-    $link = isset($attr['link']) && 'file' == $attr['link'] ? wp_get_attachment_link($id, $size, false, false) : wp_get_attachment_link($id, $size, true, false);
-
-    $output .= '<li>' . $link;
-    if (trim($attachment->post_excerpt)) {
-      $output .= '<div class="caption hidden">' . wptexturize($attachment->post_excerpt) . '</div>';
-    }
-    $output .= '</li>';
-  }
-
-  $output .= '</ul>';
-
-  return $output;
-}
-if (current_theme_supports('bootstrap-gallery')) {
-  remove_shortcode('gallery');
-  add_shortcode('gallery', 'roots_gallery');
-}
-
-/**
  * Remove unnecessary dashboard widgets
  *
  * @link http://www.deluxeblogtips.com/2011/01/remove-dashboard-widgets-in-wordpress.html
@@ -378,61 +230,6 @@ function roots_remove_default_description($bloginfo) {
   return ($bloginfo === $default_tagline) ? '' : $bloginfo;
 }
 add_filter('get_bloginfo_rss', 'roots_remove_default_description');
-
-/**
- * Allow more tags in TinyMCE including <iframe> and <script>
- */
-function roots_change_mce_options($options) {
-  $ext = 'pre[id|name|class|style],iframe[align|longdesc|name|width|height|frameborder|scrolling|marginheight|marginwidth|src],script[charset|defer|language|src|type]';
-
-  if (isset($initArray['extended_valid_elements'])) {
-    $options['extended_valid_elements'] .= ',' . $ext;
-  } else {
-    $options['extended_valid_elements'] = $ext;
-  }
-
-  return $options;
-}
-add_filter('tiny_mce_before_init', 'roots_change_mce_options');
-
-/**
- * Add additional classes onto widgets
- *
- * @link http://wordpress.org/support/topic/how-to-first-and-last-css-classes-for-sidebar-widgets
- */
-function roots_widget_first_last_classes($params) {
-  global $my_widget_num;
-
-  $this_id = $params[0]['id'];
-  $arr_registered_widgets = wp_get_sidebars_widgets();
-
-  if (!$my_widget_num) {
-    $my_widget_num = array();
-  }
-
-  if (!isset($arr_registered_widgets[$this_id]) || !is_array($arr_registered_widgets[$this_id])) {
-    return $params;
-  }
-
-  if (isset($my_widget_num[$this_id])) {
-    $my_widget_num[$this_id] ++;
-  } else {
-    $my_widget_num[$this_id] = 1;
-  }
-
-  $class = 'class="widget-' . $my_widget_num[$this_id] . ' ';
-
-  if ($my_widget_num[$this_id] == 1) {
-    $class .= 'widget-first ';
-  } elseif ($my_widget_num[$this_id] == count($arr_registered_widgets[$this_id])) {
-    $class .= 'widget-last ';
-  }
-
-  $params[0]['before_widget'] = preg_replace('/class=\"/', "$class", $params[0]['before_widget'], 1);
-
-  return $params;
-}
-add_filter('dynamic_sidebar_params', 'roots_widget_first_last_classes');
 
 /**
  * Redirects search results from /?s=query to /search/query/, converts %20 to +

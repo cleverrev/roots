@@ -11,7 +11,6 @@
     </div>
     <footer>
       <?php wp_link_pages(array('before' => '<nav class="page-nav"><p>' . __('Pages:', 'roots'), 'after' => '</p></nav>')); ?>
-      <?php the_tags('<ul class="entry-tags"><li>','</li><li>','</li></ul>'); ?>
     </footer>
     <?php tha_entry_bottom(); ?>
     <?php tha_comments_before(); ?>
