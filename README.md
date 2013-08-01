@@ -56,3 +56,7 @@ RewriteRule . /index.php [L]
 # END WordPress
 
 ```
+
+## Contributing
+
+[![Screencast](doc/assets/img/yt.gif)](http://youtu.be/PyDRV_Z4oKg)
