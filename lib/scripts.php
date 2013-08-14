@@ -29,13 +29,45 @@ function roots_scripts() {
     wp_enqueue_script('comment-reply');
   }
 
-  wp_register_script('modernizr', get_template_directory_uri() . '/assets/js/vendor/modernizr-2.6.2.min.js', false, null, false);
-  wp_register_script('roots_plugins', get_template_directory_uri() . '/assets/js/plugins.js', false, null, true);
-  wp_register_script('roots_main', get_template_directory_uri() . '/assets/js/main.js', false, null, true);
-  wp_enqueue_script('jquery');
-  wp_enqueue_script('modernizr');
-  wp_enqueue_script('roots_plugins');
-  wp_enqueue_script('roots_main');
+  /**
+   * Enhanced script register and enqueue
+   * @category   JavaScript
+   * @package    RootsThemeExamples
+   * @author     Joel Kuzmarski <leoj3n+RootsThemeExamples@gmail.com>
+   * @copyright  2013-2014 Joel Kuzmarski
+   * @license    http://www.gnu.org/licenses/gpl-3.0.txt
+   *             GNU General Public License, Version 3
+   * @link       https://github.com/leoj3n/roots/tree/example.backbone
+   */
+  foreach (
+    array(
+      array('jquery'),
+      array('modernizr',
+        'vendor/modernizr-2.6.2.min.js', false, null, false), // in head
+      array('common_base',
+        'bower_components/todomvc-common/base.js'),
+      array('backbone'),
+      array('backbone_ls',
+        'bower_components/backbone.localStorage/backbone.localStorage.js'),
+      array('models_todo', 'models/todo.js'),
+      array('collections_todo', 'collections/todos.js'),
+      array('views_todo_view', 'views/todo-view.js'),
+      array('views_app_view', 'views/app-view.js'),
+      array('routers_router', 'routers/router.js'),
+      array('roots_plugins', 'plugins.js'),
+      array('roots_main', 'main.js')
+    ) as $k => $v
+  ) {
+    if (isset($v[1])) {
+      $v = array_replace(array('', '', false, null, true), $v); // in foot
+      wp_register_script(
+        $v[0],
+        get_template_directory_uri().'/assets/js/'.$v[1],
+        $v[2], $v[3], $v[4]
+      );
+    }
+    wp_enqueue_script($v[0]);
+  }
 }
 add_action('wp_enqueue_scripts', 'roots_scripts', 100);
 

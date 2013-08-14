@@ -1,0 +1,8 @@
+{
+  "name": "roots-backbone",
+  "version": "0.0.0",
+  "dependencies": {
+    "todomvc-common": "~0.1.4",
+    "backbone.localStorage": "~1.1.0"
+  }
+}
