@@ -1,0 +1,7 @@
+{
+  "name": "leoj3n/roots",
+  "description": "Proof of concept using Roots Theme as a parent theme without removing theme support for root-relative-urls or rewrites. Also implements Theme Hook Alliance.",
+  "keywords": [ "roots", "theme", "wordpress" ],
+  "homepage": "https://github.com/leoj3n/roots",
+  "license": "GPL-2.0"
+}
